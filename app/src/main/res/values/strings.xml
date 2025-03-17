@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Phone Shop</string>
+    <string name="login">Bejelentkezés</string>
+    <string name="email">Email</string>
+    <string name="password">Jelszó</string>
+    <string name="google_account">Google Fiók</string>
+    <string name="login_as_guest">Vendég</string>
+    <string name="register">Regisztráció</string>
+</resources>
