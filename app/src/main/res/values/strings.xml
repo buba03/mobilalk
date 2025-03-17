@@ -6,4 +6,7 @@
     <string name="google_account">Google Fiók</string>
     <string name="login_as_guest">Vendég</string>
     <string name="register">Regisztráció</string>
+    <string name="cancel">Mégse</string>
+    <string name="username">Felhasználónév</string>
+    <string name="password_confirm">Jelszó ismétlése</string>
 </resources>

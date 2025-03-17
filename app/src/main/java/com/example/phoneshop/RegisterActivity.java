@@ -1,7 +1,5 @@
 package com.example.phoneshop;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,52 +11,48 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class MainActivity extends AppCompatActivity {
-    private static final String LOG_TAG = MainActivity.class.getName();
-    private static final String PREF_KEY = MainActivity.class.getPackage().toString();
+public class RegisterActivity extends AppCompatActivity {
+    private static final String LOG_TAG = RegisterActivity.class.getName();
     private static final int SECRET_KEY = 99;
-    private static final int RC_SIGN_IN = 123;
+    private static final String PREF_KEY = RegisterActivity.class.getPackage().toString();
 
+    EditText usernameEditText;
     EditText emailEditText;
     EditText passwordEditText;
-
-    private SharedPreferences preferences;
-//    private FirebaseAuth mAuth;
-//    private GoogleSignInClient mGoogleSignInClient;
+    EditText passwordConfirmEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_register);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
+        int secret_key = getIntent().getIntExtra("SECRET_KEY", 0);
+        if (secret_key != 99) {
+            finish();
+        }
+
+        usernameEditText = findViewById(R.id.usernameEditText);
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
+        passwordConfirmEditText = findViewById(R.id.passwordConfirmEditText);
     }
 
-    public void login(View view) {
-        String email = emailEditText.getText().toString();
-        String password = passwordEditText.getText().toString();
-
-        Log.d(LOG_TAG, "login pressed");
-    }
-
-    public void guestLogin(View view) {
-        Log.d(LOG_TAG, "guestLogin pressed");
-    }
-
-    public void googleLogin(View view) {
-        Log.d(LOG_TAG, "googleLogin pressed");
+    public void cancel(View view) {
+        finish();
     }
 
     public void register(View view) {
-        Intent intent = new Intent(this, RegisterActivity.class);
-        intent.putExtra("SECRET_KEY", SECRET_KEY);
-        startActivity(intent);
+        String username = usernameEditText.getText().toString();
+        String email = emailEditText.getText().toString();
+        String password = passwordEditText.getText().toString();
+        String passwordConfirm = passwordConfirmEditText.getText().toString();
+
+        Log.d(LOG_TAG, "register pressed");
     }
 }
