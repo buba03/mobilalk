@@ -1,15 +1,24 @@
 package com.example.phoneshop;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class RegisterActivity extends AppCompatActivity {
     private static final String LOG_TAG = RegisterActivity.class.getName();
@@ -19,7 +28,10 @@ public class RegisterActivity extends AppCompatActivity {
     EditText usernameEditText;
     EditText emailEditText;
     EditText passwordEditText;
-    EditText passwordConfirmEditText;
+    EditText passwordAgainEditText;
+
+    private SharedPreferences preferences;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,15 +44,25 @@ public class RegisterActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Check secret key
         int secret_key = getIntent().getIntExtra("SECRET_KEY", 0);
         if (secret_key != 99) {
             finish();
         }
 
+        // Fields
         usernameEditText = findViewById(R.id.usernameEditText);
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
-        passwordConfirmEditText = findViewById(R.id.passwordConfirmEditText);
+        passwordAgainEditText = findViewById(R.id.passwordAgainEditText);
+
+        // Preferences
+        preferences = getSharedPreferences(PREF_KEY, MODE_PRIVATE);
+        String email = preferences.getString("email", "");
+        emailEditText.setText(email);
+
+        // Firebase
+        mAuth = FirebaseAuth.getInstance();
     }
 
     public void cancel(View view) {
@@ -51,8 +73,33 @@ public class RegisterActivity extends AppCompatActivity {
         String username = usernameEditText.getText().toString();
         String email = emailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
-        String passwordConfirm = passwordConfirmEditText.getText().toString();
+        String passwordAgain = passwordAgainEditText.getText().toString();
 
-        Log.d(LOG_TAG, "register pressed");
+        // Check passwords
+        if(!password.equals(passwordAgain)) {
+            Log.e(LOG_TAG, "Passwords don't match");
+            Toast.makeText(RegisterActivity.this, "Passwords don't match", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Firebase
+        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()) {
+                    Log.d(LOG_TAG, "User created successfully!");
+                    openProducts();
+                } else {
+                    Log.d(LOG_TAG, "Failed to create user!");
+                    Toast.makeText(RegisterActivity.this, "Failed to create user. " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void openProducts() {
+        Intent intent = new Intent(this, ProductsActivity.class);
+        intent.putExtra("SECRET_KEY", SECRET_KEY);
+        startActivity(intent);
     }
 }

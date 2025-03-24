@@ -8,5 +8,6 @@
     <string name="register">Regisztráció</string>
     <string name="cancel">Mégse</string>
     <string name="username">Felhasználónév</string>
-    <string name="password_confirm">Jelszó ismétlése</string>
+    <string name="password_again">Jelszó ismétlése</string>
+    <string name="profile">Profil</string>
 </resources>
