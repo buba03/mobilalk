@@ -86,8 +86,8 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void openProfile() {
-        Intent intent = new Intent(this, ProfileActivity.class);
+    private void openProducts() {
+        Intent intent = new Intent(this, ProductsActivity.class);
         intent.putExtra("SECRET_KEY", SECRET_KEY);
         startActivity(intent);
     }
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()) {
                     Log.d(LOG_TAG, "Login successful!");
-                    openProfile();
+                    openProducts();
                 } else {
                     Log.d(LOG_TAG, "Login failed!");
                     Toast.makeText(MainActivity.this, "Login failed. " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()) {
                     Log.d(LOG_TAG, "Guest login successful!");
-                    openProfile();
+                    openProducts();
                 } else {
                     Log.d(LOG_TAG, "Guest login failed!");
                     Toast.makeText(MainActivity.this, "Guest login failed. " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()) {
                     Log.d(LOG_TAG, "Google login successful!");
-                    openProfile();
+                    openProducts();
                 } else {
                     Log.d(LOG_TAG, "Google login failed!");
                     Toast.makeText(MainActivity.this, "Google login failed. " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();

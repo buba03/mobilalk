@@ -10,4 +10,76 @@
     <string name="username">Felhasználónév</string>
     <string name="password_again">Jelszó ismétlése</string>
     <string name="profile">Profil</string>
+    <string name="product_item_title_placeholder">Termék neve</string>
+    <string name="product_item_description_placeholder">Termék leírása</string>
+    <string name="add_to_cart">Kosárba</string>
+    <string name="storage_empty">Tárhely:</string>
+    <string name="ram_empty">RAM:</string>
+
+    <string-array name="product_item_names">
+        <item>Nothing Phone (2a)</item>
+        <item>Nothing CMF Phone 1</item>
+        <item>vivo V40 SE</item>
+        <item>Samsung Galaxy A55</item>
+        <item>Samsung Galaxy S21 FE 5G</item>
+        <item>Xiaomi Redmi Note 14 Pro 5G</item>
+        <item>Tecno Pova 6 Pro</item>
+        <item>OnePlus Nord CE4</item>
+    </string-array>
+
+    <string-array name="product_item_storages">
+        <item>128GB, 256GB</item>
+        <item>128GB, 256GB</item>
+        <item>256GB</item>
+        <item>128GB, 256GB</item>
+        <item>128GB, 256GB</item>
+        <item>256GB, 512GB</item>
+        <item>256GB</item>
+        <item>128GB, 256GB</item>
+    </string-array>
+
+    <string-array name="product_item_rams">
+        <item>8GB, 12GB</item>
+        <item>6GB, 8GB</item>
+        <item>8GB</item>
+        <item>6GB, 8GB, 12GB</item>
+        <item>6GB, 8GB</item>
+        <item>8GB, 12GB</item>
+        <item>8GB, 12GB</item>
+        <item>8GB</item>
+    </string-array>
+
+    <string-array name="product_item_prices">
+        <item>97.000 Ft</item>
+        <item>93.000 Ft</item>
+        <item>72.999 Ft</item>
+        <item>122.999 Ft</item>
+        <item>81.499 Ft</item>
+        <item>109.999 Ft</item>
+        <item>187.999 Ft</item>
+        <item>89.999 Ft</item>
+    </string-array>
+
+    <array name="product_item_rates">
+        <item>4.4</item>
+        <item>4.7</item>
+        <item>3.5</item>
+        <item>4.0</item>
+        <item>3.2</item>
+        <item>3.6</item>
+        <item>2.3</item>
+        <item>4.0</item>
+    </array>
+
+    <array name="product_item_images">
+        <item>@drawable/nothing_phone_2a</item>
+        <item>@drawable/nothing_cmf_phone_1</item>
+        <item>@drawable/vivo_v40_se</item>
+        <item>@drawable/samsung_galaxy_a55</item>
+        <item>@drawable/samsung_galaxy_s21_fe_5g</item>
+        <item>@drawable/xiaomi_redmi_note_14_pro_5g</item>
+        <item>@drawable/tecno_pova_6_pro</item>
+        <item>@drawable/oneplus_nord_ce4</item>
+    </array>
+
 </resources>
