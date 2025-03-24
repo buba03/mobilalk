@@ -25,11 +25,16 @@ public class ProductItemAdapter extends RecyclerView.Adapter<ProductItemAdapter.
     private ArrayList<ProductItem> mProductItemsDataAll;
     private Context mContext;
     private int lastPosition = -1;
+    private boolean showImages = true;
 
     ProductItemAdapter(Context context, ArrayList<ProductItem> itemsData) {
         this.mContext = context;
         this.mProductItemsData = itemsData;
         this.mProductItemsDataAll = itemsData;
+    }
+
+    public void setShowImages(boolean showImages) {
+        this.showImages = showImages;
     }
 
     @NonNull
@@ -47,6 +52,13 @@ public class ProductItemAdapter extends RecyclerView.Adapter<ProductItemAdapter.
             Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_row);
             holder.itemView.startAnimation(animation);
             lastPosition = holder.getAdapterPosition();
+        }
+
+        // Hide image if grid view
+        if (showImages) {
+            holder.mImageView.setVisibility(View.VISIBLE);
+        } else {
+            holder.mImageView.setVisibility(View.GONE);
         }
     }
 
@@ -114,6 +126,9 @@ public class ProductItemAdapter extends RecyclerView.Adapter<ProductItemAdapter.
                 @Override
                 public void onClick(View view) {
                     Log.d("Activity", "Add to cart button pressed!");
+                    Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.scale);
+                    view.startAnimation(animation);
+                    ((ProductsActivity) mContext).updateAlertIcon();
                 }
             });
         }

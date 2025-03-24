@@ -1,12 +1,23 @@
 package com.example.phoneshop;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.SearchView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.view.MenuItemCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -26,6 +37,10 @@ public class ProductsActivity extends AppCompatActivity {
     private ArrayList<ProductItem> mProductList;
     private ProductItemAdapter mAdapter;
     private int gridNumber = 1;
+    private boolean viewRow = true;
+    private int cartItemCount = 0;
+    private FrameLayout redCircle;
+    private TextView countTextView;
 
     private FirebaseUser user;
 
@@ -87,5 +102,99 @@ public class ProductsActivity extends AppCompatActivity {
 
         imageResourcesList.recycle();
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        getMenuInflater().inflate(R.menu.product_list_menu, menu);
+        MenuItem menuItem = menu.findItem(R.id.searchBar);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                // After button press
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                // After text change
+                Log.d(LOG_TAG, s);
+                mAdapter.getFilter().filter(s);
+                return false;
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // After menu item press
+        int id = item.getItemId();
+
+        if (id == R.id.logoutButton) {
+            Log.d(LOG_TAG, "Log out button pressed!");
+            FirebaseAuth.getInstance().signOut();
+            finish();
+            return true;
+        } else if (id == R.id.settingsButton) {
+            Log.d(LOG_TAG, "Settings button pressed!");
+            return true;
+        } else if (id == R.id.viewSelector) {
+            Log.d(LOG_TAG, "View button pressed!" + " grid: " + gridNumber + " viewRow: " + viewRow);
+            if (viewRow) {
+                changeSpanCount(item, R.drawable.ic_view_grid, 2);
+            } else {
+                changeSpanCount(item, R.drawable.ic_view_row, 1);
+            }
+            return true;
+        } else if (id == R.id.cartButton) {
+            Log.d(LOG_TAG, "Cart button pressed!");
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        final MenuItem alertMenuItem = menu.findItem(R.id.cartButton);
+        FrameLayout rootView = (FrameLayout) alertMenuItem.getActionView();
+
+        assert rootView != null;
+        redCircle = (FrameLayout) rootView.findViewById(R.id.view_alert_red_circle);
+        countTextView = (TextView) rootView.findViewById(R.id.view_alert_count_textview);
+
+        rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(alertMenuItem);
+            }
+        });
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void changeSpanCount(MenuItem item, int drawableId, int spanCount) {
+        viewRow = !viewRow;
+        item.setIcon(drawableId);
+        GridLayoutManager layoutManager = (GridLayoutManager) mRecyclerView.getLayoutManager();
+        layoutManager.setSpanCount(spanCount);
+
+        // Hide the image when span is increased
+        mAdapter.setShowImages(viewRow);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public void updateAlertIcon() {
+        cartItemCount += 1;
+        Log.d(LOG_TAG, "Updating alert icon to " + cartItemCount);
+        if (0 < cartItemCount) {
+            countTextView.setText(String.valueOf(cartItemCount));
+            redCircle.setVisibility(VISIBLE);
+        } else {
+            countTextView.setText("");
+            redCircle.setVisibility(GONE);
+        }
     }
 }

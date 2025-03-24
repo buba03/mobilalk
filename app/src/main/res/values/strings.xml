@@ -15,6 +15,11 @@
     <string name="add_to_cart">Kosárba</string>
     <string name="storage_empty">Tárhely:</string>
     <string name="ram_empty">RAM:</string>
+    <string name="search">Keresés</string>
+    <string name="logout">Kijelentkezés</string>
+    <string name="settings">Beállítások</string>
+    <string name="cart">Kosár</string>
+    <string name="view">Nézet</string>
 
     <string-array name="product_item_names">
         <item>Nothing Phone (2a)</item>
