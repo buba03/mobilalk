@@ -43,6 +43,11 @@ public class ProductItemAdapter extends RecyclerView.Adapter<ProductItemAdapter.
         ProductItem currentItem = mProductItemsData.get(position);
 
         holder.bindTo(currentItem);
+        if (holder.getAdapterPosition() > lastPosition) {
+            Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_row);
+            holder.itemView.startAnimation(animation);
+            lastPosition = holder.getAdapterPosition();
+        }
     }
 
     @Override
