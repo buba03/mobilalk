@@ -6,7 +6,10 @@ public class ProductItem {
     private String ram;
     private String price;
     private float rating;
-    private final int imageResource;
+    private int imageResource;
+
+
+    public ProductItem() {}
 
     public ProductItem(String name, String storage, String ram, String price, float rating, int imageResource) {
         this.name = name;

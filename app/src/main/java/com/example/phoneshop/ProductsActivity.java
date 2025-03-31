@@ -10,7 +10,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -23,8 +22,14 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
@@ -43,6 +48,8 @@ public class ProductsActivity extends AppCompatActivity {
     private TextView countTextView;
 
     private FirebaseUser user;
+    private FirebaseFirestore mFirestore;
+    private CollectionReference mItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +83,28 @@ public class ProductsActivity extends AppCompatActivity {
         mProductList = new ArrayList<>();
         mAdapter = new ProductItemAdapter(this, mProductList);
         mRecyclerView.setAdapter(mAdapter);
-        initializeData();
+        // Firestore
+        mFirestore = FirebaseFirestore.getInstance();
+        mItems = mFirestore.collection("products");
+        queryData();
+    }
+
+    private void queryData() {
+        mProductList.clear();
+
+        mItems.orderBy("name"/*, Query.Direction.DESCENDING*/).limit(8).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                ProductItem item = document.toObject(ProductItem.class);
+                mProductList.add(item);
+            }
+
+            if (mProductList.isEmpty()) {
+                initializeData();
+                queryData();
+            }
+
+            mAdapter.notifyDataSetChanged();
+        });
     }
 
     private void initializeData() {
@@ -87,10 +115,8 @@ public class ProductsActivity extends AppCompatActivity {
         TypedArray imageResourcesList = getResources().obtainTypedArray(R.array.product_item_images);
         TypedArray ratingList = getResources().obtainTypedArray(R.array.product_item_rates);
 
-        mProductList.clear();
-
         for (int i = 0; i < nameList.length; i++) {
-            mProductList.add(new ProductItem(
+            mItems.add(new ProductItem(
                     nameList[i],
                     storageList[i],
                     ramList[i],
@@ -99,9 +125,7 @@ public class ProductsActivity extends AppCompatActivity {
                     imageResourcesList.getResourceId(i, 0)
             ));
         }
-
         imageResourcesList.recycle();
-        mAdapter.notifyDataSetChanged();
     }
 
     @Override
