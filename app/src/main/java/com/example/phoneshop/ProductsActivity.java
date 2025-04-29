@@ -38,6 +38,7 @@ public class ProductsActivity extends AppCompatActivity {
     private static final String PREF_KEY = ProductsActivity.class.getPackage().toString();
     private static final int SECRET_KEY = 99;
 
+    // Elements
     private RecyclerView mRecyclerView;
     private ArrayList<ProductItem> mProductList;
     private ProductItemAdapter mAdapter;
@@ -47,9 +48,13 @@ public class ProductsActivity extends AppCompatActivity {
     private FrameLayout redCircle;
     private TextView countTextView;
 
+    // Firebase
     private FirebaseUser user;
     private FirebaseFirestore mFirestore;
     private CollectionReference mItems;
+
+    // Notification
+    private NotificationHandler mNotificationHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +92,9 @@ public class ProductsActivity extends AppCompatActivity {
         mFirestore = FirebaseFirestore.getInstance();
         mItems = mFirestore.collection("products");
         queryData();
+
+        // Notification
+        mNotificationHandler = new NotificationHandler(this);
     }
 
     private void queryData() {
@@ -114,6 +122,7 @@ public class ProductsActivity extends AppCompatActivity {
         DocumentReference ref = mItems.document(item._getId());
         ref.delete().addOnSuccessListener(success -> {
             Log.d(LOG_TAG, "Item successfully deleted with id: "+ item._getId());
+            mNotificationHandler.send("Product deleted", item.getName());
         }).addOnFailureListener(failure -> {
             Toast.makeText(this, "Couldn't delete item with id: "+ item._getId(), Toast.LENGTH_LONG).show();
             Log.d(LOG_TAG, "Couldn't delete item with id: "+ item._getId());
