@@ -15,6 +15,9 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Firestore (images?)
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -44,6 +47,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:21.3.0'
     // Firestore
     implementation 'com.google.firebase:firebase-firestore:25.1.3'
+    // Firestore (images?)
+    implementation 'com.android.support:multidex:1.0.3'
 
     // GUI
     implementation 'com.github.bumptech.glide:glide:4.16.0'
