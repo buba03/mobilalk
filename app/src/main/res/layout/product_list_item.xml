@@ -90,14 +90,30 @@
                 android:padding="@dimen/small_padding"
                 android:textStyle="italic" />
 
-            <Button
-                android:id="@+id/addToCartButton"
+            <LinearLayout
+                android:id="@+id/buttonsLinearLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_centerHorizontal="true"
-                android:layout_below="@id/itemPrice"
-                android:padding="@dimen/small_padding"
-                android:text="@string/add_to_cart" />
+                android:layout_below="@id/itemPrice">
+
+                <Button
+                    android:id="@+id/addToCartButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/small_padding"
+                    android:layout_margin="@dimen/small_padding"
+                    android:text="@string/add_to_cart" />
+
+                <Button
+                    android:id="@+id/deleteButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/small_padding"
+                    android:layout_margin="@dimen/small_padding"
+                    android:text="@string/delete" />
+            </LinearLayout>
 
         </RelativeLayout>
     </LinearLayout>

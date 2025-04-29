@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,6 +27,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -90,11 +92,14 @@ public class ProductsActivity extends AppCompatActivity {
     }
 
     private void queryData() {
+        // Load data from Firestore
+        // If Firestore is empty, load from local storage
         mProductList.clear();
 
-        mItems.orderBy("name"/*, Query.Direction.DESCENDING*/).limit(8).get().addOnSuccessListener(queryDocumentSnapshots -> {
+        mItems.orderBy("inCartCount", Query.Direction.DESCENDING).limit(8).get().addOnSuccessListener(queryDocumentSnapshots -> {
             for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                 ProductItem item = document.toObject(ProductItem.class);
+                item.setId(document.getId());
                 mProductList.add(item);
             }
 
@@ -107,7 +112,20 @@ public class ProductsActivity extends AppCompatActivity {
         });
     }
 
+    public void deleteProduct(ProductItem item) {
+        DocumentReference ref = mItems.document(item._getId());
+        ref.delete().addOnSuccessListener(success -> {
+            Log.d(LOG_TAG, "Item successfully deleted with id: "+ item._getId());
+        }).addOnFailureListener(failure -> {
+            Toast.makeText(this, "Couldn't delete item with id: "+ item._getId(), Toast.LENGTH_LONG).show();
+            Log.d(LOG_TAG, "Couldn't delete item with id: "+ item._getId());
+        });
+
+        queryData();
+    }
+
     private void initializeData() {
+        // Get data locally
         String[] nameList = getResources().getStringArray(R.array.product_item_names);
         String[] storageList = getResources().getStringArray(R.array.product_item_storages);
         String[] ramList = getResources().getStringArray(R.array.product_item_rams);
@@ -122,7 +140,8 @@ public class ProductsActivity extends AppCompatActivity {
                     ramList[i],
                     priceList[i],
                     ratingList.getFloat(i, 0),
-                    imageResourcesList.getResourceId(i, 0)
+                    imageResourcesList.getResourceId(i, 0),
+                    0   // inCartCount
             ));
         }
         imageResourcesList.recycle();
@@ -210,7 +229,7 @@ public class ProductsActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
     }
 
-    public void updateAlertIcon() {
+    public void updateAlertIcon(ProductItem item) {
         cartItemCount += 1;
         Log.d(LOG_TAG, "Updating alert icon to " + cartItemCount);
         if (0 < cartItemCount) {
@@ -220,5 +239,14 @@ public class ProductsActivity extends AppCompatActivity {
             countTextView.setText("");
             redCircle.setVisibility(GONE);
         }
+
+        redCircle.setVisibility((cartItemCount > 0) ? VISIBLE : GONE);
+        mItems.document(item._getId()).update("inCartCount", item.getInCartCount() + 1)
+            .addOnFailureListener(failure -> {
+                Toast.makeText(this, "Couldn't update item's 'inCartCount' with id: "+ item._getId(), Toast.LENGTH_LONG).show();
+            }
+        );
+
+        queryData();
     }
 }

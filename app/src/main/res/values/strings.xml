@@ -20,6 +20,7 @@
     <string name="settings">Beállítások</string>
     <string name="cart">Kosár</string>
     <string name="view">Nézet</string>
+    <string name="delete">Törlés</string>
 
     <string-array name="product_item_names">
         <item>Nothing Phone (2a)</item>

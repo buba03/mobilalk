@@ -121,16 +121,6 @@ public class ProductItemAdapter extends RecyclerView.Adapter<ProductItemAdapter.
             mPriceTextView = itemView.findViewById(R.id.itemPrice);
             mRatingBar = itemView.findViewById(R.id.itemRatingBar);
             mImageView = itemView.findViewById(R.id.itemImage);
-
-            itemView.findViewById(R.id.addToCartButton).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.d("Activity", "Add to cart button pressed!");
-                    Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.scale);
-                    view.startAnimation(animation);
-                    ((ProductsActivity) mContext).updateAlertIcon();
-                }
-            });
         }
 
         public void bindTo(ProductItem currentItem) {
@@ -140,6 +130,27 @@ public class ProductItemAdapter extends RecyclerView.Adapter<ProductItemAdapter.
             mPriceTextView.setText(currentItem.getPrice());
             Glide.with(mContext).load(currentItem.getImageResource()).into(mImageView);
             mRatingBar.setRating(currentItem.getRating());
+
+            // Add button
+            itemView.findViewById(R.id.addToCartButton).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d("Activity", "Add to cart button pressed!");
+                    Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.scale);
+                    view.startAnimation(animation);
+                    ((ProductsActivity) mContext).updateAlertIcon(currentItem);
+                }
+            });
+            // Delete button
+            itemView.findViewById(R.id.deleteButton).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d("Activity", "Delete from cart button pressed!");
+                    Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.scale);
+                    view.startAnimation(animation);
+                    ((ProductsActivity) mContext).deleteProduct(currentItem);
+                }
+            });
         }
     }
 }
