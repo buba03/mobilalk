@@ -102,4 +102,11 @@ public class RegisterActivity extends AppCompatActivity {
         intent.putExtra("SECRET_KEY", SECRET_KEY);
         startActivity(intent);
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Stop Registration process when leaving the app
+        finish();
+    }
 }
