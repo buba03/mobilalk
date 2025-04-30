@@ -1,10 +1,16 @@
 package com.example.phoneshop;
 
+import static android.app.PendingIntent.FLAG_IMMUTABLE;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.MenuItemCompat;
@@ -55,6 +62,8 @@ public class ProductsActivity extends AppCompatActivity {
 
     // Notification
     private NotificationHandler mNotificationHandler;
+    // Alarm
+    private AlarmManager mAlarmManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +104,8 @@ public class ProductsActivity extends AppCompatActivity {
 
         // Notification
         mNotificationHandler = new NotificationHandler(this);
+        // Alarm
+        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
     }
 
     private void queryData() {
@@ -122,7 +133,7 @@ public class ProductsActivity extends AppCompatActivity {
         DocumentReference ref = mItems.document(item._getId());
         ref.delete().addOnSuccessListener(success -> {
             Log.d(LOG_TAG, "Item successfully deleted with id: "+ item._getId());
-            mNotificationHandler.send("Product deleted", item.getName());
+            mNotificationHandler.send("Termék törölve!", item.getName());
         }).addOnFailureListener(failure -> {
             Toast.makeText(this, "Couldn't delete item with id: "+ item._getId(), Toast.LENGTH_LONG).show();
             Log.d(LOG_TAG, "Couldn't delete item with id: "+ item._getId());
@@ -255,5 +266,30 @@ public class ProductsActivity extends AppCompatActivity {
         );
 
         queryData();
+    }
+
+
+    @RequiresPermission(Manifest.permission.SCHEDULE_EXACT_ALARM)
+    private void setAlarmManager() {
+        // Notification after 10 seconds
+        long repeatInterval = 10 * 1000;
+        long triggerTime = SystemClock.elapsedRealtime() + repeatInterval;
+
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, FLAG_IMMUTABLE);
+
+        mAlarmManager.setExact(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                triggerTime,
+                pendingIntent
+        );
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (cartItemCount > 0) {
+            setAlarmManager();
+        }
     }
 }
