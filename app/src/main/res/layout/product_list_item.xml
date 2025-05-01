@@ -92,28 +92,40 @@
 
             <LinearLayout
                 android:id="@+id/buttonsLinearLayout"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_centerHorizontal="true"
+                android:gravity="center_horizontal"
                 android:layout_below="@id/itemPrice">
 
-                <Button
+                <ImageButton
                     android:id="@+id/addToCartButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/small_padding"
-                    android:layout_margin="@dimen/small_padding"
-                    android:text="@string/add_to_cart" />
+                    android:layout_weight="1"
+                    android:padding="@dimen/icon_padding"
+                    android:backgroundTint="@color/icon"
+                    android:src="@drawable/ic_add_to_cart" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/deleteButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/small_padding"
-                    android:layout_margin="@dimen/small_padding"
-                    android:text="@string/delete" />
+                    android:layout_weight="1"
+                    android:padding="@dimen/icon_padding"
+                    android:backgroundTint="@color/icon"
+                    android:src="@drawable/ic_delete" />
+
+                <ImageButton
+                    android:id="@+id/editButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="@dimen/icon_padding"
+                    android:backgroundTint="@color/icon"
+                    android:src="@drawable/ic_edit" />
             </LinearLayout>
+
 
         </RelativeLayout>
     </LinearLayout>
