@@ -96,6 +96,11 @@ public class MainActivity extends AppCompatActivity {
         String email = emailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
 
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(MainActivity.this, "Sikertelen bejelentkezés.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -104,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                     openProducts();
                 } else {
                     Log.d(LOG_TAG, "Login failed!");
-                    Toast.makeText(MainActivity.this, "Login failed. " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Sikertelen bejelentkezés. " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
