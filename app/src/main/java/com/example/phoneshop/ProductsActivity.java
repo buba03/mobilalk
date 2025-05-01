@@ -5,10 +5,13 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -21,8 +24,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.MenuItemCompat;
 import androidx.core.view.ViewCompat;
@@ -44,6 +49,7 @@ public class ProductsActivity extends AppCompatActivity {
     private static final String LOG_TAG = ProductsActivity.class.getName();
     private static final String PREF_KEY = ProductsActivity.class.getPackage().toString();
     private static final int SECRET_KEY = 99;
+    private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
     // Elements
     private RecyclerView mRecyclerView;
@@ -102,6 +108,8 @@ public class ProductsActivity extends AppCompatActivity {
         mItems = mFirestore.collection("products");
         queryData();
 
+        // Permission
+        checkNotificationPermission();
         // Notification
         mNotificationHandler = new NotificationHandler(this);
         // Alarm
@@ -268,9 +276,14 @@ public class ProductsActivity extends AppCompatActivity {
         queryData();
     }
 
-
-    @RequiresPermission(Manifest.permission.SCHEDULE_EXACT_ALARM)
     private void setAlarmManager() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!mAlarmManager.canScheduleExactAlarms()) {
+                Log.w(LOG_TAG, "Exact alarms not permitted. Consider requesting permission.");
+                Toast.makeText(this, "Hiányzó jogosultságok!", Toast.LENGTH_LONG);
+                return;
+            }
+        }
         // Notification after 10 seconds
         long repeatInterval = 10 * 1000;
         long triggerTime = SystemClock.elapsedRealtime() + repeatInterval;
@@ -289,7 +302,17 @@ public class ProductsActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (cartItemCount > 0) {
-            setAlarmManager();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                setAlarmManager();
+            }
+        }
+    }
+
+    private void checkNotificationPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.SCHEDULE_EXACT_ALARM) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                requestPermissions(new String[]{Manifest.permission.SCHEDULE_EXACT_ALARM}, REQUEST_CODE_ASK_PERMISSIONS);
+            }
         }
     }
 }
