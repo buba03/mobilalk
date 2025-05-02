@@ -16,10 +16,16 @@
         app:actionLayout="@layout/custom_menu_item"
         />
     <item
+        android:id="@+id/createButton"
+        android:title="@string/create"
+        android:icon="@drawable/ic_add"
+        app:showAsAction="always"
+        />
+    <item
         android:id="@+id/viewSelector"
         android:title="@string/view"
         android:icon="@drawable/ic_view_row"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         />
     <item
         android:id="@+id/settingsButton"

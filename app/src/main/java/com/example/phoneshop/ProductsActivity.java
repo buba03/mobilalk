@@ -5,10 +5,10 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.os.Build;
@@ -24,8 +24,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.RequiresApi;
-import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
@@ -61,6 +59,9 @@ public class ProductsActivity extends AppCompatActivity {
     private FrameLayout redCircle;
     private TextView countTextView;
 
+    // Preferences
+    private SharedPreferences preferences;
+
     // Firebase
     private FirebaseUser user;
     private FirebaseFirestore mFirestore;
@@ -87,6 +88,9 @@ public class ProductsActivity extends AppCompatActivity {
         if (secret_key != 99) {
             finish();
         }
+
+        // Preferences
+        preferences = getSharedPreferences(PREF_KEY, MODE_PRIVATE);
 
         // Firebase
         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -150,6 +154,19 @@ public class ProductsActivity extends AppCompatActivity {
         queryData();
     }
 
+    public void editProduct(ProductItem item) {
+        Intent intent = new Intent(this, EditProductActivity.class);
+        intent.putExtra("SECRET_KEY", SECRET_KEY);
+        if (item != null) {
+            intent.putExtra("productId", item._getId());
+        }
+        startActivity(intent);
+    }
+
+    private static String getName(ProductItem item) {
+        return item.getName();
+    }
+
     private void initializeData() {
         // Get data locally
         String[] nameList = getResources().getStringArray(R.array.product_item_names);
@@ -208,9 +225,16 @@ public class ProductsActivity extends AppCompatActivity {
             FirebaseAuth.getInstance().signOut();
             finish();
             return true;
+
         } else if (id == R.id.settingsButton) {
             Log.d(LOG_TAG, "Settings button pressed!");
             return true;
+
+        } else if (id == R.id.createButton) {
+            Log.d(LOG_TAG, "Create button pressed!");
+            editProduct(null);
+            return true;
+
         } else if (id == R.id.viewSelector) {
             Log.d(LOG_TAG, "View button pressed!" + " grid: " + gridNumber + " viewRow: " + viewRow);
             if (viewRow) {
@@ -219,10 +243,12 @@ public class ProductsActivity extends AppCompatActivity {
                 changeSpanCount(item, R.drawable.ic_view_row, 1);
             }
             return true;
+
         } else if (id == R.id.cartButton) {
             Log.d(LOG_TAG, "Cart button pressed!");
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -266,7 +292,7 @@ public class ProductsActivity extends AppCompatActivity {
             redCircle.setVisibility(GONE);
         }
 
-        redCircle.setVisibility((cartItemCount > 0) ? VISIBLE : GONE);
+        // Update item in Firestore
         mItems.document(item._getId()).update("inCartCount", item.getInCartCount() + 1)
             .addOnFailureListener(failure -> {
                 Toast.makeText(this, "Couldn't update item's 'inCartCount' with id: "+ item._getId(), Toast.LENGTH_LONG).show();
@@ -296,6 +322,13 @@ public class ProductsActivity extends AppCompatActivity {
                 triggerTime,
                 pendingIntent
         );
+    }
+
+    @Override
+    protected void onResume() {
+        // Refresh data after resuming (because of editing/creating)
+        super.onResume();
+        queryData();
     }
 
     @Override

@@ -46,7 +46,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Check secret key
         int secret_key = getIntent().getIntExtra("SECRET_KEY", 0);
-        if (secret_key != 99) {
+        if (secret_key != SECRET_KEY) {
             finish();
         }
 

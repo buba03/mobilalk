@@ -131,7 +131,7 @@ public class ProductItemAdapter extends RecyclerView.Adapter<ProductItemAdapter.
             Glide.with(mContext).load(currentItem.getImageResource()).into(mImageView);
             mRatingBar.setRating(currentItem.getRating());
 
-            // Add button
+            // Cart button
             itemView.findViewById(R.id.addToCartButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -149,6 +149,16 @@ public class ProductItemAdapter extends RecyclerView.Adapter<ProductItemAdapter.
                     Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.scale);
                     view.startAnimation(animation);
                     ((ProductsActivity) mContext).deleteProduct(currentItem);
+                }
+            });
+            // Edit button
+            itemView.findViewById(R.id.editButton).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d("Activity", "Edit button pressed!");
+                    Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.scale);
+                    view.startAnimation(animation);
+                    ((ProductsActivity) mContext).editProduct(currentItem);
                 }
             });
         }
