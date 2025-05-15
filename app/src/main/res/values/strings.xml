@@ -27,6 +27,10 @@
     <string name="edit">Szerkesztés</string>
     <string name="create">Létrehozás</string>
     <string name="price">Ár</string>
+    <string name="filter">Szűrés</string>
+    <string name="popular_products">Népszerű termékek</string>
+    <string name="cheap_phones">Olcsó telefonok</string>
+    <string name="best_rated">Legjobbra értékelt</string>
 
     <string-array name="product_item_names">
         <item>Nothing Phone (2a)</item>
@@ -61,16 +65,16 @@
         <item>8GB</item>
     </string-array>
 
-    <string-array name="product_item_prices">
-        <item>97.000 Ft</item>
-        <item>93.000 Ft</item>
-        <item>72.999 Ft</item>
-        <item>122.999 Ft</item>
-        <item>81.499 Ft</item>
-        <item>109.999 Ft</item>
-        <item>108.999 Ft</item>
-        <item>89.999 Ft</item>
-    </string-array>
+    <array name="product_item_prices">
+        <item>97000</item>
+        <item>93000</item>
+        <item>72999</item>
+        <item>122999</item>
+        <item>81499</item>
+        <item>109999</item>
+        <item>108999</item>
+        <item>89999</item>
+    </array>
 
     <array name="product_item_rates">
         <item>4.4</item>

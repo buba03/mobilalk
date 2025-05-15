@@ -70,7 +70,7 @@
                 android:ems="10"
                 android:layout_marginVertical="@dimen/side_margin"
                 android:hint="@string/price"
-                android:inputType="text" />
+                android:inputType="numberDecimal" />
 
             <LinearLayout
                 android:id="@+id/linearLayout"

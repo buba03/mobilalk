@@ -22,6 +22,24 @@
         app:showAsAction="always"
         />
     <item
+        android:id="@+id/filterButton"
+        android:title="@string/filter"
+        android:icon="@drawable/ic_filter"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <item
+                android:id="@+id/filter_popular"
+                android:title="@string/popular_products" />
+            <item
+                android:id="@+id/filter_budget"
+                android:title="@string/cheap_phones" />
+            <item
+                android:id="@+id/filter_top_rated"
+                android:title="@string/best_rated" />
+        </menu>
+    </item>
+    <item
         android:id="@+id/viewSelector"
         android:title="@string/view"
         android:icon="@drawable/ic_view_row"

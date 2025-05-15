@@ -5,7 +5,7 @@ public class ProductItem {
     private String name;
     private String storage;
     private String ram;
-    private String price;
+    private float price;
     private float rating;
     private int imageResource;
     private int inCartCount;
@@ -13,7 +13,7 @@ public class ProductItem {
 
     public ProductItem() {}
 
-    public ProductItem(String name, String storage, String ram, String price, float rating, int imageResource, int inCartCount) {
+    public ProductItem(String name, String storage, String ram, float price, float rating, int imageResource, int inCartCount) {
         this.name = name;
         this.storage = storage;
         this.ram = ram;
@@ -35,7 +35,7 @@ public class ProductItem {
         return ram;
     }
 
-    public String getPrice() {
+    public float getPrice() {
         return price;
     }
 

@@ -69,7 +69,7 @@ public class EditProductActivity extends AppCompatActivity {
                     nameEditText.setText(document.getString("name"));
                     storageEditText.setText(document.getString("storage"));
                     ramEditText.setText(document.getString("ram"));
-                    priceEditText.setText(document.getString("price"));
+                    priceEditText.setText(document.getDouble("price").toString());
                 }
             });
         } else {
@@ -87,10 +87,10 @@ public class EditProductActivity extends AppCompatActivity {
         String name = nameEditText.getText().toString().trim();
         String storage = storageEditText.getText().toString().trim();
         String ram = ramEditText.getText().toString().trim();
-        String price = priceEditText.getText().toString().trim();
+        float price = Float.parseFloat(priceEditText.getText().toString().trim());
 
-        if (name.isEmpty() || storage.isEmpty() || ram.isEmpty() || price.isEmpty()) {
-            Toast.makeText(this, "Hiányzó mezők!", Toast.LENGTH_SHORT).show();
+        if (name.isEmpty() || storage.isEmpty() || ram.isEmpty() || price < 0) {
+            Toast.makeText(this, "Hiányzó vagy hibás mezők!", Toast.LENGTH_SHORT).show();
             return;
         }
 

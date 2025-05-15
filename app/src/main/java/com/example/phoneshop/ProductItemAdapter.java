@@ -127,7 +127,7 @@ public class ProductItemAdapter extends RecyclerView.Adapter<ProductItemAdapter.
             mTitleTextView.setText(currentItem.getName());
             mStorageTextView.setText(currentItem.getStorage());
             mRamTextView.setText(currentItem.getRam());
-            mPriceTextView.setText(currentItem.getPrice());
+            mPriceTextView.setText((int) currentItem.getPrice() + " Ft");
             Glide.with(mContext).load(currentItem.getImageResource()).into(mImageView);
             mRatingBar.setRating(currentItem.getRating());
 

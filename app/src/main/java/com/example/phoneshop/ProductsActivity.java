@@ -5,7 +5,6 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -26,6 +25,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -74,6 +74,15 @@ public class ProductsActivity extends AppCompatActivity {
     // Alarm
     private AlarmManager mAlarmManager;
 
+    // Filtering
+    enum FilterMode {
+        IN_CART_COUNT,
+        BUDGET,
+        TOP_5_RATED
+    }
+
+    private FilterMode queryMode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +113,7 @@ public class ProductsActivity extends AppCompatActivity {
         }
 
         // Listing
+        queryMode = FilterMode.TOP_5_RATED;
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, gridNumber));
         mProductList = new ArrayList<>();
@@ -128,30 +138,75 @@ public class ProductsActivity extends AppCompatActivity {
         // If Firestore is empty, load from local storage
         mProductList.clear();
 
-        mItems.orderBy("inCartCount", Query.Direction.DESCENDING).limit(8).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                ProductItem item = document.toObject(ProductItem.class);
-                item.setId(document.getId());
-                mProductList.add(item);
-            }
+        if (queryMode == FilterMode.IN_CART_COUNT) {
+            Log.d(LOG_TAG, "IN_CART_COUNT");
+            mItems.orderBy("inCartCount", Query.Direction.DESCENDING).get().addOnSuccessListener(queryDocumentSnapshots -> {
+                mProductList.clear();
+                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    ProductItem item = document.toObject(ProductItem.class);
+                    item.setId(document.getId());
+                    mProductList.add(item);
+                }
 
-            if (mProductList.isEmpty()) {
-                initializeData();
-                queryData();
-            }
+                if (mProductList.isEmpty()) {
+                    initializeData();
+                    queryData();
+                }
 
-            mAdapter.notifyDataSetChanged();
-        });
+                mAdapter.notifyDataSetChanged();
+                return;
+            });
+        }
+
+        if (queryMode == FilterMode.BUDGET) {
+            mItems.whereLessThan("price", 100000).orderBy("price", Query.Direction.ASCENDING).get().addOnSuccessListener(queryDocumentSnapshots -> {
+                mProductList.clear();
+                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    ProductItem item = document.toObject(ProductItem.class);
+                    item.setId(document.getId());
+                    mProductList.add(item);
+                    Log.d(LOG_TAG, item.getName());
+                }
+
+                if (mProductList.isEmpty()) {
+                    initializeData();
+                    queryData();
+                }
+
+                mAdapter.notifyDataSetChanged();
+                return;
+            });
+
+        }
+
+        if (queryMode == FilterMode.TOP_5_RATED) {
+            mItems.orderBy("rating", Query.Direction.DESCENDING).limit(5).get().addOnSuccessListener(queryDocumentSnapshots -> {
+                mProductList.clear();
+                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    ProductItem item = document.toObject(ProductItem.class);
+                    item.setId(document.getId());
+                    mProductList.add(item);
+                }
+
+                if (mProductList.isEmpty()) {
+                    initializeData();
+                    queryData();
+                }
+
+                mAdapter.notifyDataSetChanged();
+                return;
+            });
+        }
     }
 
     public void deleteProduct(ProductItem item) {
         DocumentReference ref = mItems.document(item._getId());
         ref.delete().addOnSuccessListener(success -> {
-            Log.d(LOG_TAG, "Item successfully deleted with id: "+ item._getId());
+            Log.d(LOG_TAG, "Item successfully deleted with id: " + item._getId());
             mNotificationHandler.send("Termék törölve!", item.getName());
         }).addOnFailureListener(failure -> {
-            Toast.makeText(this, "Couldn't delete item with id: "+ item._getId(), Toast.LENGTH_LONG).show();
-            Log.d(LOG_TAG, "Couldn't delete item with id: "+ item._getId());
+            Toast.makeText(this, "Couldn't delete item with id: " + item._getId(), Toast.LENGTH_LONG).show();
+            Log.d(LOG_TAG, "Couldn't delete item with id: " + item._getId());
         });
 
         queryData();
@@ -171,7 +226,7 @@ public class ProductsActivity extends AppCompatActivity {
         String[] nameList = getResources().getStringArray(R.array.product_item_names);
         String[] storageList = getResources().getStringArray(R.array.product_item_storages);
         String[] ramList = getResources().getStringArray(R.array.product_item_rams);
-        String[] priceList = getResources().getStringArray(R.array.product_item_prices);
+        TypedArray priceList = getResources().obtainTypedArray(R.array.product_item_prices);
         TypedArray imageResourcesList = getResources().obtainTypedArray(R.array.product_item_images);
         TypedArray ratingList = getResources().obtainTypedArray(R.array.product_item_rates);
 
@@ -180,7 +235,7 @@ public class ProductsActivity extends AppCompatActivity {
                     nameList[i],
                     storageList[i],
                     ramList[i],
-                    priceList[i],
+                    priceList.getFloat(i, 0),
                     ratingList.getFloat(i, 0),
                     imageResourcesList.getResourceId(i, 0),
                     0   // inCartCount
@@ -192,8 +247,9 @@ public class ProductsActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-
+        // Load
         getMenuInflater().inflate(R.menu.product_list_menu, menu);
+        // Search
         MenuItem menuItem = menu.findItem(R.id.searchBar);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -219,21 +275,42 @@ public class ProductsActivity extends AppCompatActivity {
         // After menu item press
         int id = item.getItemId();
 
+        // Logout
         if (id == R.id.logoutButton) {
             Log.d(LOG_TAG, "Log out button pressed!");
             FirebaseAuth.getInstance().signOut();
             finish();
             return true;
 
+        // Settings
         } else if (id == R.id.settingsButton) {
             Log.d(LOG_TAG, "Settings button pressed!");
             return true;
 
+        // Add
         } else if (id == R.id.createButton) {
             Log.d(LOG_TAG, "Create button pressed!");
             editProduct(null);
             return true;
 
+        // Filter
+        } else if (id == R.id.filter_popular) {
+            Log.d(LOG_TAG, "'filter_popular' button pressed!");
+            queryMode = FilterMode.IN_CART_COUNT;
+            queryData();
+            return true;
+        } else if (id == R.id.filter_budget) {
+            Log.d(LOG_TAG, "'filter_budget' button pressed!");
+            queryMode = FilterMode.BUDGET;
+            queryData();
+            return true;
+        } else if (id == R.id.filter_top_rated) {
+            Log.d(LOG_TAG, "'filter_top_rated' button pressed!");
+            queryMode = FilterMode.TOP_5_RATED;
+            queryData();
+            return true;
+
+        // Change view
         } else if (id == R.id.viewSelector) {
             Log.d(LOG_TAG, "View button pressed!" + " grid: " + gridNumber + " viewRow: " + viewRow);
             if (viewRow) {
@@ -243,6 +320,7 @@ public class ProductsActivity extends AppCompatActivity {
             }
             return true;
 
+        // Cart
         } else if (id == R.id.cartButton) {
             Log.d(LOG_TAG, "Cart button pressed!");
             return true;
@@ -293,10 +371,10 @@ public class ProductsActivity extends AppCompatActivity {
 
         // Update item in Firestore
         mItems.document(item._getId()).update("inCartCount", item.getInCartCount() + 1)
-            .addOnFailureListener(failure -> {
-                Toast.makeText(this, "Couldn't update item's 'inCartCount' with id: "+ item._getId(), Toast.LENGTH_LONG).show();
-            }
-        );
+                .addOnFailureListener(failure -> {
+                            Toast.makeText(this, "Couldn't update item's 'inCartCount' with id: " + item._getId(), Toast.LENGTH_LONG).show();
+                        }
+                );
 
         queryData();
     }
