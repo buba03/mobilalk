@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.app.ActivityCompat;
@@ -43,13 +44,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class ProductsActivity extends AppCompatActivity {
     private static final String LOG_TAG = ProductsActivity.class.getName();
     private static final String PREF_KEY = ProductsActivity.class.getPackage().toString();
     private static final int SECRET_KEY = 99;
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
+    private static final String COLLECTION_NAME = "Products_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH"));
 
     // Elements
     private RecyclerView mRecyclerView;
@@ -113,7 +118,7 @@ public class ProductsActivity extends AppCompatActivity {
         }
 
         // Listing
-        queryMode = FilterMode.TOP_5_RATED;
+        queryMode = FilterMode.IN_CART_COUNT;
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, gridNumber));
         mProductList = new ArrayList<>();
@@ -121,7 +126,7 @@ public class ProductsActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
         // Firestore
         mFirestore = FirebaseFirestore.getInstance();
-        mItems = mFirestore.collection("products");
+        mItems = mFirestore.collection(COLLECTION_NAME);
         queryData();
 
         // Permission
@@ -215,6 +220,7 @@ public class ProductsActivity extends AppCompatActivity {
     public void editProduct(ProductItem item) {
         Intent intent = new Intent(this, EditProductActivity.class);
         intent.putExtra("SECRET_KEY", SECRET_KEY);
+        intent.putExtra("collectionName", COLLECTION_NAME);
         if (item != null) {
             intent.putExtra("productId", item._getId());
         }

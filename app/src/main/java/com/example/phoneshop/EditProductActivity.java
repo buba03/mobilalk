@@ -31,6 +31,7 @@ public class EditProductActivity extends AppCompatActivity {
     private SharedPreferences preferences;
     private FirebaseAuth mAuth;
     private FirebaseFirestore mFirestore;
+    private String collectionName;
     private String productId = null; // Will be null if creating new product
 
 
@@ -61,10 +62,11 @@ public class EditProductActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
 
+        collectionName = getIntent().getStringExtra("collectionName");
         productId = getIntent().getStringExtra("productId");
         // If editing existing product, load it
         if (productId != null) {
-            mFirestore.collection("products").document(productId).get().addOnSuccessListener(document -> {
+            mFirestore.collection(collectionName).document(productId).get().addOnSuccessListener(document -> {
                 if (document.exists()) {
                     nameEditText.setText(document.getString("name"));
                     storageEditText.setText(document.getString("storage"));
@@ -96,7 +98,7 @@ public class EditProductActivity extends AppCompatActivity {
 
         if (productId != null) {
             // Update existing product
-            DocumentReference productRef = mFirestore.collection("products").document(productId);
+            DocumentReference productRef = mFirestore.collection(collectionName).document(productId);
             productRef.update("name", name, "storage", storage, "ram", ram, "price", price)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(this, "Sikeres szerkesztés!", Toast.LENGTH_SHORT).show();
@@ -106,7 +108,7 @@ public class EditProductActivity extends AppCompatActivity {
         } else {
             // Add new product
             ProductItem newProduct = new ProductItem(name, storage, ram, price, 0f, R.drawable.ic_phone, 0);
-            mFirestore.collection("products").add(newProduct)
+            mFirestore.collection(collectionName).add(newProduct)
                     .addOnSuccessListener(documentReference -> {
                         Toast.makeText(this, "Sikeres létrehozás!", Toast.LENGTH_SHORT).show();
                         finish();

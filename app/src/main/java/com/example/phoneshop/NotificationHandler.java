@@ -46,7 +46,7 @@ public class NotificationHandler {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, CHANNEL_ID)
                 .setContentTitle(title)
                 .setContentText(message)
-                .setSmallIcon(R.drawable.ic_shopping_cart)
+                .setSmallIcon(R.drawable.ic_phone)
                 .setContentIntent(pendingIntent);
 
         this.mManager.notify(NOTIFICATION_ID, builder.build());
